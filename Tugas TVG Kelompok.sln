@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tugas TVG Kelompok", "Tugas TVG Kelompok\Tugas TVG Kelompok.csproj", "{CE478963-817C-4826-8529-087987575338}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE478963-817C-4826-8529-087987575338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE478963-817C-4826-8529-087987575338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE478963-817C-4826-8529-087987575338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE478963-817C-4826-8529-087987575338}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ABBCC596-D9C5-4170-8E9C-5A5A07F4819E}
+	EndGlobalSection
+EndGlobal
