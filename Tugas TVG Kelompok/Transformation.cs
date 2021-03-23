@@ -16,7 +16,7 @@ namespace Tugas_TVG_Hafizh_Aradhana_Harimurti_49249
 
         }
 
-        public static double TransformationsToTransformationMatrix(List<Transformation> transformations)
+        public static double[,] TransformationsToTransformationMatrix(List<Transformation> transformations)
         {
             List<double[,]> transformationMatrices = new List<double[,]>();
             List<Transformation> tempTransformationList = new List<Transformation>();
@@ -40,9 +40,23 @@ namespace Tugas_TVG_Hafizh_Aradhana_Harimurti_49249
                             beta = Math.Atan2(x, y);
                             miu = Math.Atan2(Math.Sqrt(Math.Pow(x,2)+Math.Pow(z,2)), y);
                             tempTransformationList.Add(new Transformation { TransformName = "Translate", amountX = -transformation.pivotX1, amountY = -transformation.pivotY1, amountZ = -transformation.pivotZ1 });
-                            tempTransformationList.Add(new Transformation { TransformName = "RotateY", theta = beta });
+                            tempTransformationList.Add(new Transformation { TransformName = "RotateY", theta = -beta });
                             tempTransformationList.Add(new Transformation { TransformName = "RotateX", theta = miu });
+                            tempTransformationList.Add(new Transformation { TransformName = "RotateZ", theta = transformation.theta });
+                            tempTransformationList.Add(new Transformation { TransformName = "RotateX", theta = -miu });
+                            tempTransformationList.Add(new Transformation { TransformName = "RotateY", theta = beta });
                             tempTransformationList.Add(new Transformation { TransformName = "Translate", amountX = transformation.pivotX1, amountY = transformation.pivotY1, amountZ = transformation.pivotZ1 });
+                            break;
+                        }
+                    default:
+                        {
+                            tempTransformationList.Add(new Transformation
+                            {
+                                TransformName = transformation.TransformName,
+                                amountX = transformation.amountX,
+                                amountY = transformation.amountY,
+                                amountZ = transformation.amountZ,
+                            });
                             break;
                         }
                 }    
@@ -50,62 +64,81 @@ namespace Tugas_TVG_Hafizh_Aradhana_Harimurti_49249
             double[,] tempMatrix;
             foreach (Transformation tempTransformation in tempTransformationList)
             {
-                switch(transformation.TransformName)
+                tempMatrix = IdentityMatrix();
+                switch(tempTransformation.TransformName)
                 {
                     case "Translate":
                         {
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[0, 3] = transformation.amountX;
-                            tempMatrix[1, 3] = transformation.amountY;
-                            tempMatrix[2, 3] = transformation.amountZ;
+                            tempMatrix[0, 3] = tempTransformation.amountX;
+                            tempMatrix[1, 3] = tempTransformation.amountY;
+                            tempMatrix[2, 3] = tempTransformation.amountZ;
                             transformationMatrices.Add(tempMatrix);
                             break;
                         }
                     case "Scale":
                         {
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[0, 3] = -transformation.pivotX1;
-                            tempMatrix[1, 3] = -transformation.pivotY1;
-                            tempMatrix[2, 3] = -transformation.pivotZ1;
-                            transformationMatrices.Add(tempMatrix);
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[0, 0] = transformation.amountX;
-                            tempMatrix[1, 1] = transformation.amountY;
-                            tempMatrix[2, 2] = transformation.amountZ;
-                            transformationMatrices.Add(tempMatrix);
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[0, 3] = transformation.pivotX1;
-                            tempMatrix[1, 3] = transformation.pivotY1;
-                            tempMatrix[2, 3] = transformation.pivotZ1;
+                            tempMatrix[0, 0] = tempTransformation.amountX;
+                            tempMatrix[1, 1] = tempTransformation.amountY;
+                            tempMatrix[2, 2] = tempTransformation.amountZ;
                             transformationMatrices.Add(tempMatrix);
                             break;
                         }
                     case "ShearXY":
                         {
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[0, 2] = transformation.amountX;
-                            tempMatrix[1, 2] = transformation.amountY;
+                            tempMatrix[0, 2] = tempTransformation.amountX;
+                            tempMatrix[1, 2] = tempTransformation.amountY;
                             transformationMatrices.Add(tempMatrix);
                             break;
                         }
                     case "ShearYZ":
                         {
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[0, 1] = transformation.amountY;
-                            tempMatrix[2, 1] = transformation.amountZ;
+                            tempMatrix[0, 1] = tempTransformation.amountY;
+                            tempMatrix[2, 1] = tempTransformation.amountZ;
                             transformationMatrices.Add(tempMatrix);
                             break;
                         }
                     case "ShearXZ":
                         {
-                            tempMatrix = IdentityMatrix();
-                            tempMatrix[1, 0] = transformation.amountX;
-                            tempMatrix[2, 0] = transformation.amountZ;
+                            tempMatrix[1, 0] = tempTransformation.amountX;
+                            tempMatrix[2, 0] = tempTransformation.amountZ;
+                            transformationMatrices.Add(tempMatrix);
+                            break;
+                        }
+                    case "RotateX":
+                        {
+                            tempMatrix[1, 1] = Math.Cos(tempTransformation.theta);
+                            tempMatrix[1, 2] = -Math.Sin(tempTransformation.theta);
+                            tempMatrix[2, 1] = Math.Sin(tempTransformation.theta);
+                            tempMatrix[2, 2] = Math.Cos(tempTransformation.theta);
+                            transformationMatrices.Add(tempMatrix);
+                            break;
+                        }
+                    case "RotateY":
+                        {
+                            tempMatrix[0, 0] = Math.Cos(tempTransformation.theta);
+                            tempMatrix[0, 2] = Math.Sin(tempTransformation.theta);
+                            tempMatrix[2, 0] = -Math.Sin(tempTransformation.theta);
+                            tempMatrix[2, 2] = Math.Cos(tempTransformation.theta);
+                            transformationMatrices.Add(tempMatrix);
+                            break;
+                        }
+                    case "RotateZ":
+                        {
+                            tempMatrix[0, 0] = Math.Cos(tempTransformation.theta);
+                            tempMatrix[0, 1] = -Math.Sin(tempTransformation.theta);
+                            tempMatrix[1, 0] = Math.Sin(tempTransformation.theta);
+                            tempMatrix[1, 1] = Math.Cos(tempTransformation.theta);
                             transformationMatrices.Add(tempMatrix);
                             break;
                         }
                 }
             }
+            double[,] transformationMatrix = IdentityMatrix();
+            foreach(double[,] matrices in transformationMatrices)
+            {
+                transformationMatrix = MatrixMultiplication(matrices, transformationMatrix);
+            }
+            return transformationMatrix;
         }
 
         public static List<Point3D> Transform(List<Point3D> cartesianPoints, List<Transformation> transformationList)
@@ -113,45 +146,17 @@ namespace Tugas_TVG_Hafizh_Aradhana_Harimurti_49249
             List<Point3D> result = new List<Point3D>();
             List<Transformation> transformations = new List<Transformation>();
             result.AddRange(cartesianPoints.Select(cartesian => new Point3D { X = cartesian.X, Y = cartesian.Y }));
-            double[,] transformation, transformationMatrix = new double[3, 3] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
-            double[] coordinate = new double[3];
+            double[] coordinate = new double[4];
             Point3D transformationResult;
-            foreach (Transformation transformationType in transformations) //Membuat matriks transformasi dari semua transformasi yang diberikan
-            {
-                transformation = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-                switch(transformationType.TransformName)
-                {
-                    case "Translate":
-                        {
-                            transformation[0, 3] = transformationType.amountX;
-                            transformation[1, 3] = transformationType.amountY;
-                            transformation[2, 3] = transformationType.amountZ;
-                            break;
-                        }
-                    case "Scale":
-                        {
-                            transformation[0, 0] = transformationType.amountX;
-                            transformation[1, 1] = transformationType.amountY;
-                            transformation[2, 2] = transformationType.amountZ;
-                            break;
-                        }
-                    case "Shear":
-                        {
-                            transformation[0, 0] = transformationType.amountX;
-                            transformation[1, 1] = transformationType.amountY;
-                            transformation[2, 2] = transformationType.amountZ;
-                            break;
-                        }
-                }
-                transformationMatrix = MatrixMultiplication(transformation, transformationMatrix);
-            }
+            double[,] transformationMatrix = TransformationsToTransformationMatrix(transformationList);
             for (int i = 0; i < result.Count; i++)
             {
                 coordinate[0] = result[i].X;
                 coordinate[1] = result[i].Y;
-                coordinate[2] = 1;
+                coordinate[2] = result[i].Z;
+                coordinate[3] = 1;
                 coordinate = MatrixMultiplication(transformationMatrix, coordinate);
-                transformationResult = new Point3D(Convert.ToSingle(Math.Round(coordinate[0], 3)), Convert.ToSingle(Math.Round(coordinate[1], 3)));
+                transformationResult = new Point3D(Convert.ToSingle(Math.Round(coordinate[0], 3)), Convert.ToSingle(Math.Round(coordinate[1], 3)), Convert.ToSingle(Math.Round(coordinate[2],3)));
                 result[i] = transformationResult;
             }
             return result;
