@@ -16,7 +16,7 @@ namespace Transform3D
         {
             var CubeMesh = new MeshGeometry3D();
 
-            CubeMesh.Positions = new Point3DCollection(new List<Point3D>() {
+            var MeshPoints = new List<Point3D>() {
                 new Point3D(0.5, 0.5, 0.5),
                 new Point3D(-0.5, 0.5, 0.5),
                 new Point3D(-0.5, -0.5, 0.5),
@@ -25,7 +25,21 @@ namespace Transform3D
                 new Point3D(-0.5, 0.5, -0.5),
                 new Point3D(-0.5, -0.5, -0.5),
                 new Point3D(0.5, -0.5, -0.5)
+            };
+
+            //Transform
+            Transformation.Transform(MeshPoints, new List<Transformation>()
+            {
+                new Transformation()
+                {
+                    TransformName = "Scale",
+                    amountX = 1.1,
+                    amountY = 1.2,
+                    amountZ = 0.5
+                }
             });
+
+            CubeMesh.Positions = new Point3DCollection(MeshPoints);
 
             CubeMesh.TriangleIndices = new Int32Collection(new int[] {
                 // Front
