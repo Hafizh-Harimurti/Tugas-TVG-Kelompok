@@ -181,7 +181,7 @@ namespace Transform3D
         }
         public static double[] MatrixMultiplication(double[,] matrix1, double[] matrix2)
         {
-            double[] result = new double[3];
+            double[] result = new double[4];
             for (int i = 0; i < 4; i++)
             {
                 result[i] = 0;
