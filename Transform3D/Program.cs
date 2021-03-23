@@ -28,18 +28,18 @@ namespace Transform3D
             };
 
             //Transform
-            Transformation.Transform(MeshPoints, new List<Transformation>()
+            var NewMeshPoints = Transformation.Transform(MeshPoints, new List<Transformation>()
             {
                 new Transformation()
                 {
                     TransformName = "Scale",
-                    amountX = 1.1,
-                    amountY = 1.2,
-                    amountZ = 0.5
+                    amountX = 1,
+                    amountY = 1,
+                    amountZ = 1
                 }
             });
 
-            CubeMesh.Positions = new Point3DCollection(MeshPoints);
+            CubeMesh.Positions = new Point3DCollection(NewMeshPoints);
 
             CubeMesh.TriangleIndices = new Int32Collection(new int[] {
                 // Front
