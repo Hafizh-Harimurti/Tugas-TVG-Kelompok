@@ -146,7 +146,7 @@ namespace Transform3D
         {
             List<Point3D> result = new List<Point3D>();
             List<Transformation> transformations = new List<Transformation>();
-            result.AddRange(cartesianPoints.Select(cartesian => new Point3D { X = cartesian.X, Y = cartesian.Y }));
+            result.AddRange(cartesianPoints.Select(cartesian => new Point3D { X = cartesian.X, Y = cartesian.Y, Z = cartesian.Z }));
             double[] coordinate = new double[4];
             Point3D transformationResult;
             double[,] transformationMatrix = TransformationsToTransformationMatrix(transformationList);
