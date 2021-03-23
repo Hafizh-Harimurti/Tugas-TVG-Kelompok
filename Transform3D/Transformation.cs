@@ -57,6 +57,7 @@ namespace Transform3D
                                 amountX = transformation.amountX,
                                 amountY = transformation.amountY,
                                 amountZ = transformation.amountZ,
+                                theta = transformation.theta
                             });
                             break;
                         }
