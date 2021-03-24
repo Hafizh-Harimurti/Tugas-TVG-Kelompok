@@ -1,20 +1,28 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Transform3D;
 
-namespace Transform3D
+namespace Render
 {
     class Program
     {
-        [STAThread]
-        static void Main(string[] args)
+        async static Task Main(string[] args)
         {
-            var CubeMesh = new MeshGeometry3D();
+            var server = new RendererServer();
+
+            double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
 
             var MeshPoints = new List<Point3D>() {
                 new Point3D(0.5, 0.5, 0.5),
@@ -27,21 +35,19 @@ namespace Transform3D
                 new Point3D(0.5, -0.5, -0.5)
             };
 
-            //Transform
-            var NewMeshPoints = Transformation.Transform(MeshPoints, new List<Transformation>()
+            // Transform.
+            var newMeshPoints = Transformation.Transform(MeshPoints, new List<Transformation>()
             {
                 new Transformation()
                 {
-                    TransformName = "Scale",
-                    amountX = 1,
-                    amountY = 1,
-                    amountZ = 1
+                    TransformName = "RotateZ",
+                    theta = DegreesToRadians(25)
                 }
             });
 
-            CubeMesh.Positions = new Point3DCollection(NewMeshPoints);
+            //CubeMesh.Positions = new Point3DCollection(NewMeshPoints);
 
-            CubeMesh.TriangleIndices = new Int32Collection(new int[] {
+            var triangleIndices = new int[] {
                 // Front
                 0,1,2,
                 0,2,3,
@@ -60,16 +66,28 @@ namespace Transform3D
                 // Bottom
                 2,6,7,
                 2,7,3
-            });
+            };
 
-            var CubeModel = new GeometryModel3D();
-            CubeModel.Geometry = CubeMesh;
-            CubeModel.Material = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+            var modelData = new ModelData()
+            {
+                Points = MeshPoints,
+                Triangles = triangleIndices
+            };
+            var newModelData = new ModelData()
+            {
+                Points = newMeshPoints,
+                Triangles = triangleIndices
+            };
 
-            var app = new Application();
-            app.Run(new RenderWindow(CubeModel));
+            server.Render(modelData);
+
+            await Task.Delay(5000);
+
+            server.Render(newModelData);
 
             Console.ReadKey();
+
+            server.Close();
         }
     }
 }
