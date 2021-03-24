@@ -45,8 +45,6 @@ namespace Render
                 }
             });
 
-            //CubeMesh.Positions = new Point3DCollection(NewMeshPoints);
-
             var triangleIndices = new int[] {
                 // Front
                 0,1,2,
@@ -81,7 +79,7 @@ namespace Render
 
             server.Render(modelData);
 
-            await Task.Delay(5000);
+            await Task.Delay(3000);
 
             server.Render(newModelData);
 

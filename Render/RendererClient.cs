@@ -26,7 +26,6 @@ namespace Render
         private RendererClient(string pipeHandle)
         {
             var pipeClient = new AnonymousPipeClientStream(PipeDirection.In, pipeHandle);
-            Debug.WriteLine($"[CLIENT] Current TransmissionMode: { pipeClient.TransmissionMode }.");
 
             _streamReader = new StreamReader(pipeClient);
 

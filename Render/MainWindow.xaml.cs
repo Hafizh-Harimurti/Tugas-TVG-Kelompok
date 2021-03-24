@@ -26,7 +26,7 @@ namespace Render
         {
             InitializeComponent();
             
-            Title = "3D Render";
+            Title = "3D Renderer";
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Width = 900;
             Height = 600;
@@ -50,8 +50,6 @@ namespace Render
             var viewport3D = new Viewport3D();
             viewport3D.Camera = camera;
             viewport3D.Children.Add(modelVisual3D);
-
-            //StartListenForModeChange(ModelGroup);
 
             Content = viewport3D;
             

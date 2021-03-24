@@ -15,10 +15,14 @@ namespace Transform3D
         private Process _pipeClient = new Process();
         private StreamWriter _streamWriter;
         private AnonymousPipeServerStream _pipeServerStream;
+        private const ConsoleColor _consoleColor = ConsoleColor.Blue;
 
         public RendererServer()
         {
+            Log("Starting up renderer...");
             SetupAnonymousPipes();
+            ClearConsoleLine();
+            Log("Renderer started.");
         }
 
         public void Render(ModelData modelData)
@@ -30,11 +34,11 @@ namespace Transform3D
 
                 _pipeServerStream.WaitForPipeDrain();
 
-                Console.WriteLine("Data sent.");
+                Log("Data sent to renderer.");
             }
             catch (IOException e)
             {
-                Console.WriteLine("[SERVER] Error: {0}", e.Message);
+                Log($"Error: {e.Message}");
             }
         }
 
@@ -50,8 +54,6 @@ namespace Transform3D
             _pipeServerStream = new AnonymousPipeServerStream(
                 PipeDirection.Out,
                 HandleInheritability.Inheritable);
-            
-            Console.WriteLine("[SERVER] Current TransmissionMode: {0}.", _pipeServerStream.TransmissionMode);
 
             // Pass the client process a handle to the server.
             _pipeClient.StartInfo.Arguments = _pipeServerStream.GetClientHandleAsString();
@@ -60,16 +62,28 @@ namespace Transform3D
 
             _pipeServerStream.DisposeLocalCopyOfClientHandle();
 
-            _streamWriter = new StreamWriter(_pipeServerStream);
-            _streamWriter.AutoFlush = true;
+            _streamWriter = new StreamWriter(_pipeServerStream)
+            {
+                AutoFlush = true
+            };
+
             _streamWriter.WriteLine("[SYNC]");
             _pipeServerStream.WaitForPipeDrain();
+        }
 
-            _pipeClient.Exited += (sender, e) =>
-            {
-                _pipeClient.Close();
-                Console.WriteLine("[SERVER] Client quit. Server terminating.");
-            };
+        private void Log(string message)
+        {
+            var color = Console.ForegroundColor;
+            Console.ForegroundColor = _consoleColor;
+            Console.WriteLine($"[Renderer] {message}");
+            Console.ForegroundColor = color;
+        }
+        private void ClearConsoleLine()
+        {
+            int currentLine = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLine - 1);
         }
     }
 }
