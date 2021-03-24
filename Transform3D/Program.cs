@@ -20,6 +20,8 @@ namespace Render
     {
         async static Task Main(string[] args)
         {
+            Console.WriteLine("Starting up...");
+
             var server = new RendererServer();
 
             double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
@@ -34,16 +36,6 @@ namespace Render
                 new Point3D(-0.5, -0.5, -0.5),
                 new Point3D(0.5, -0.5, -0.5)
             };
-
-            // Transform.
-            var newMeshPoints = Transformation.Transform(MeshPoints, new List<Transformation>()
-            {
-                new Transformation()
-                {
-                    TransformName = "RotateZ",
-                    theta = DegreesToRadians(25)
-                }
-            });
 
             var triangleIndices = new int[] {
                 // Front
@@ -66,22 +58,31 @@ namespace Render
                 2,7,3
             };
 
-            var modelData = new ModelData()
+            var newMeshPoints = MeshPoints;
+            await Task.Run(async () =>
             {
-                Points = MeshPoints,
-                Triangles = triangleIndices
-            };
-            var newModelData = new ModelData()
-            {
-                Points = newMeshPoints,
-                Triangles = triangleIndices
-            };
+                while (true)
+                {
+                    newMeshPoints = Transformation.Transform(newMeshPoints, new List<Transformation>()
+                    {
+                        new Transformation()
+                        {
+                            TransformName = "RotateY",
+                            theta = DegreesToRadians(0.5)
+                        }
+                    });
 
-            server.Render(modelData);
+                    var modelData = new ModelData()
+                    {
+                        Points = newMeshPoints,
+                        Triangles = triangleIndices
+                    };
 
-            await Task.Delay(3000);
+                    server.Render(modelData);
 
-            server.Render(newModelData);
+                    await Task.Delay(5);
+                }
+            });
 
             Console.ReadKey();
 
