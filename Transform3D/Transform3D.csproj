@@ -115,4 +115,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>XCOPY "$(ProjectDir)Samples" "$(ProjectDir)$(OutDir)" /E /Y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
