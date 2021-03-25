@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace Render
 {
-    public class SceneData
+    public class SceneData : RendererDataBase
     {
         public Point3D LookPosition { get; set; }
         public double CameraLightIntensity { get; set; }
@@ -47,11 +47,6 @@ namespace Render
                 AmbientLightIntensity = ambientLightIntensity,
                 ModelColorARGB = modelColorARGB
             };
-        }
-
-        public string Serialize()
-        {
-            return JsonConvert.SerializeObject(this);
         }
     }
 }

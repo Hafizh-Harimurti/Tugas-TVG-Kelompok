@@ -18,113 +18,173 @@ namespace Render
 {
     class Program
     {
+        private static ModelData _model = null;
+        private static ModelData _transformedModel = null;
+        private static SceneData _scene = null;
+        private static RendererServer _renderer;
+
         async static Task Main(string[] args)
         {
-            var renderer = new RendererServer();
-
-            double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
-
-            var MeshPoints = new List<Point3D>() {
-                new Point3D(0.5, 0.5, 0.5),
-                new Point3D(-0.5, 0.5, 0.5),
-                new Point3D(-0.5, -0.5, 0.5),
-                new Point3D(0.5, -0.5, 0.5),
-                new Point3D(0.5, 0.5, -0.5),
-                new Point3D(-0.5, 0.5, -0.5),
-                new Point3D(-0.5, -0.5, -0.5),
-                new Point3D(0.5, -0.5, -0.5)
-            };
-
-            var triangleIndices = new int[] {
-                // Front
-                0,1,2,
-                0,2,3,
-                // Back
-                4,7,6,
-                4,6,5,
-                // Right
-                4,0,3,
-                4,3,7,
-                // Left
-                1,5,6,
-                1,6,2,
-                // Top
-                1,0,4,
-                1,4,5,
-                // Bottom
-                2,6,7,
-                2,7,3
-            };
-
-            var newMeshPoints = MeshPoints;
-            var rotateModel = Task.Run(async () =>
+            try
             {
+                ConsoleHelper.Initialize();
+
+                // Print identity.
+                Console.WriteLine("Tugas Kelompok Teknik Visualisasi Grafis - Transformasi 3D");
+                Console.WriteLine("Identitas Anggota Kelompok :");
+                Console.WriteLine("Firdaus Bisma Suryakusuma        19/444051/TK/49247");
+                Console.WriteLine("Lorem Ipsum                      XX/XXXXXX/XX/XXXXX");
+                Console.WriteLine("Lorem Ipsum                      XX/XXXXXX/XX/XXXXX");
+                Console.WriteLine("Please wait a while.");
+                Console.WriteLine();
+                await Task.Delay(3000);
+
+                // Start up renderer
+                _renderer = new RendererServer();
+
+                _scene = SceneData.Deserialize(File.ReadAllText($"./Scenes/scene1.txt"));
+                _renderer.SetScene(_scene);
+                _model = ModelData.Deserialize(File.ReadAllText($"./Models/cube-model.txt"));
+                _renderer.Render(_model);
+
+                Console.WriteLine();
+
+                // Prompt action
                 while (true)
                 {
-                    newMeshPoints = Transformation.Transform(newMeshPoints, new List<Transformation>()
+                    Console.WriteLine("Select an action :");
+                    Console.WriteLine("[0] Load model");
+                    Console.WriteLine("[1] Load scene");
+                    Console.WriteLine("[2] Save model");
+                    Console.WriteLine("[3] Save scene");
+                    Console.WriteLine("[4] Perform a single transformation");
+                    Console.WriteLine("[5] Chain multiple transformations");
+                    Console.WriteLine("[6] Reset model");
+                    Console.WriteLine("[7] Exit");
+                    Console.Write("Select : ");
+                    var ans = Console.ReadLine();
+                    Console.WriteLine();
+
+                    if (ans == "7") break;
+
+                    switch (ans)
                     {
-                        new Transformation()
-                        {
-                            TransformName = "RotateZ",
-                            theta = DegreesToRadians(0.5)
-                        }
-                    });
-
-                    var modelData = new ModelData()
-                    {
-                        Points = newMeshPoints,
-                        Triangles = triangleIndices
-                    };
-
-                    renderer.Render(modelData);
-
-                    await Task.Delay(5);
-                }
-            });
-
-            var changeScene = Task.Run(async () =>
-            {
-                while (true)
-                {
-                    var scenes = new List<SceneData>() 
-                    {
-                        new SceneData()
-                        {
-                            LookPosition = new Point3D(3, 3, 4),
-                            AmbientLightIntensity = 0.2,
-                            CameraLightIntensity = 0.2,
-                            ModelColorARGB = Colors.GreenYellow
-                        },
-                        new SceneData()
-                        {
-                            LookPosition = new Point3D(5, -6, 7),
-                            AmbientLightIntensity = 0.6,
-                            CameraLightIntensity = 0.6,
-                            ModelColorARGB = Colors.Coral
-                        },
-                        new SceneData()
-                        {
-                            LookPosition = new Point3D(-3, -3, -3),
-                            AmbientLightIntensity = 0.8,
-                            CameraLightIntensity = 0.8,
-                            ModelColorARGB = Colors.PaleVioletRed
-                        }
-                    };
-
-                    foreach (var scene in scenes)
-                    {
-                        renderer.SetScene(scene);
-
-                        await Task.Delay(2500);
+                        case "0":
+                            LoadModel();
+                            break;
+                        case "1":
+                            LoadScene();
+                            break;
+                        case "2":
+                            break;
+                        case "3":
+                            break;
+                        case "4":
+                            break;
+                        case "5":
+                            break;
+                        case "6":
+                            break;
+                        default:
+                            WriteError("Action not recognized.");
+                            break;
                     }
+
+                    Console.WriteLine();
                 }
-            });
 
-            await Task.WhenAll(rotateModel, changeScene);
+                double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
 
-            Console.ReadKey();
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
 
-            renderer.Close();
+                _renderer.Close();
+            }
+            catch (Exception e)
+            {
+                WriteError(e.Message);
+            }
+        }
+
+        private static void LoadModel()
+        {
+            try
+            {
+                Console.WriteLine("Select a file (located in ./Models/) :");
+
+                // List files.
+                foreach (var file in Directory.GetFiles("./Models/"))
+                {
+                    Console.WriteLine(Path.GetFileName(file));
+                }
+                Console.WriteLine();
+                Console.Write("File (e.g. foobar.txt) : ");
+                var filename = Console.ReadLine();
+
+                var fileContent = File.ReadAllText($"./Models/{filename}");
+
+                _model = ModelData.Deserialize(fileContent);
+                _transformedModel = _model;
+                _renderer.Render(_transformedModel);
+
+                WriteSuccess("Model loaded.");
+            }
+            catch (Exception e)
+            {
+                WriteError($"Error loading model. Error : {e.Message}");
+            }
+        }
+
+        private static void SaveModel(string path, ModelData model)
+        {
+            File.WriteAllText(path, model.Serialize());
+        }
+
+        private static void LoadScene()
+        {
+            try
+            {
+                Console.WriteLine("Select a file (located in ./Scenes/) :");
+
+                // List files.
+                foreach (var file in Directory.GetFiles("./Scenes/"))
+                {
+                    Console.WriteLine(Path.GetFileName(file));
+                }
+                Console.WriteLine();
+                Console.Write("File (e.g. foobar.txt) : ");
+                var filename = Console.ReadLine();
+
+                var fileContent = File.ReadAllText($"./Scenes/{filename}");
+
+                _scene = SceneData.Deserialize(fileContent);
+                _renderer.SetScene(_scene);
+
+                WriteSuccess("Scene loaded.");
+            }
+            catch (Exception e)
+            {
+                WriteError($"Error loading scene. Error : {e.Message}");
+            }
+        }
+
+        private static void SaveScene(string path, SceneData scene)
+        {
+            File.WriteAllText(path, scene.Serialize());
+        }
+
+        private static void WriteError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleHelper.DefaultConsoleForegroundColor;
+        }
+
+        private static void WriteSuccess(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleHelper.DefaultConsoleForegroundColor;
         }
     }
 }

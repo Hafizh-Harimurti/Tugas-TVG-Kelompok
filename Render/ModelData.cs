@@ -9,15 +9,10 @@ using System.Windows.Media.Media3D;
 
 namespace Render
 {
-    public class ModelData
+    public class ModelData : RendererDataBase
     {
         public IList<Point3D> Points { get; set; }
         public int[] Triangles { get; set; }
-
-        public string Serialize()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
 
         public static ModelData Deserialize(string json)
         {

@@ -31,30 +31,12 @@ namespace Transform3D
 
         public void Render(ModelData modelData)
         {
-            try
-            {
-                _sendQueue.Enqueue($"[ModelData]{modelData.Serialize()}");
-
-                Log("Model data sent to the renderer.");
-            }
-            catch (IOException e)
-            {
-                Log($"Error: {e.Message}");
-            }
+            _sendQueue.Enqueue($"[ModelData]{modelData.Serialize()}");
         }
 
         public void SetScene(SceneData sceneData)
         {
-            try
-            {
-                _sendQueue.Enqueue($"[SceneData]{sceneData.Serialize()}");
-
-                Log("Scene data sent to the renderer.");
-            }
-            catch (IOException e)
-            {
-                Log($"Error: {e.Message}");
-            }
+            _sendQueue.Enqueue($"[SceneData]{sceneData.Serialize()}");
         }
 
         public void Close()
@@ -70,9 +52,18 @@ namespace Transform3D
                 {
                     if (_sendQueue.Count > 0)
                     {
-                        _streamWriter.WriteLine(_sendQueue.Dequeue());
+                        try
+                        {
+                            _streamWriter.WriteLine(_sendQueue.Dequeue());
 
-                        _pipeServerStream.WaitForPipeDrain();
+                            _pipeServerStream.WaitForPipeDrain();
+
+                            Log("Render data sent to the renderer.");
+                        }
+                        catch (Exception e)
+                        {
+                            Log($"Error: {e.Message}");
+                        }
                     }
                 }
             });
@@ -106,10 +97,9 @@ namespace Transform3D
         {
             if (LoggingEnabled)
             {
-                var color = Console.ForegroundColor;
                 Console.ForegroundColor = _consoleColor;
                 Console.WriteLine($"[Renderer] {message}");
-                Console.ForegroundColor = color;
+                Console.ForegroundColor = ConsoleHelper.DefaultConsoleForegroundColor;
             }
         }
 

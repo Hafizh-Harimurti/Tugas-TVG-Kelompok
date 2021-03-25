@@ -37,7 +37,7 @@ namespace Render
         {
             InitializeComponent();
             
-            Title = "3D Renderer";
+            Title = "3D Renderer - Control from the console window.";
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Width = 900;
             Height = 600;
