@@ -42,11 +42,6 @@ namespace Render
                 // Start up renderer
                 _renderer = new RendererServer();
 
-                _scene = SceneData.Deserialize(File.ReadAllText($"./Scenes/scene1.txt"));
-                _renderer.SetScene(_scene);
-                _model = ModelData.Deserialize(File.ReadAllText($"./Models/cube-model.txt"));
-                _renderer.Render(_model);
-
                 Console.WriteLine();
 
                 // Prompt action
