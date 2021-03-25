@@ -20,9 +20,7 @@ namespace Render
     {
         async static Task Main(string[] args)
         {
-            Console.WriteLine("Starting up...");
-
-            var server = new RendererServer();
+            var renderer = new RendererServer();
 
             double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
 
@@ -59,7 +57,7 @@ namespace Render
             };
 
             var newMeshPoints = MeshPoints;
-            await Task.Run(async () =>
+            var rotateModel = Task.Run(async () =>
             {
                 while (true)
                 {
@@ -67,7 +65,7 @@ namespace Render
                     {
                         new Transformation()
                         {
-                            TransformName = "RotateY",
+                            TransformName = "RotateZ",
                             theta = DegreesToRadians(0.5)
                         }
                     });
@@ -78,15 +76,55 @@ namespace Render
                         Triangles = triangleIndices
                     };
 
-                    server.Render(modelData);
+                    renderer.Render(modelData);
 
                     await Task.Delay(5);
                 }
             });
 
+            var changeScene = Task.Run(async () =>
+            {
+                while (true)
+                {
+                    var scenes = new List<SceneData>() 
+                    {
+                        new SceneData()
+                        {
+                            LookPosition = new Point3D(3, 3, 4),
+                            AmbientLightIntensity = 0.2,
+                            CameraLightIntensity = 0.2,
+                            ModelColorARGB = Colors.GreenYellow
+                        },
+                        new SceneData()
+                        {
+                            LookPosition = new Point3D(5, -6, 7),
+                            AmbientLightIntensity = 0.6,
+                            CameraLightIntensity = 0.6,
+                            ModelColorARGB = Colors.Coral
+                        },
+                        new SceneData()
+                        {
+                            LookPosition = new Point3D(-3, -3, -3),
+                            AmbientLightIntensity = 0.8,
+                            CameraLightIntensity = 0.8,
+                            ModelColorARGB = Colors.PaleVioletRed
+                        }
+                    };
+
+                    foreach (var scene in scenes)
+                    {
+                        renderer.SetScene(scene);
+
+                        await Task.Delay(2500);
+                    }
+                }
+            });
+
+            await Task.WhenAll(rotateModel, changeScene);
+
             Console.ReadKey();
 
-            server.Close();
+            renderer.Close();
         }
     }
 }

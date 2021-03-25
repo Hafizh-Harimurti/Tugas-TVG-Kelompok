@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Media3D;
 
 namespace Render
 {
@@ -14,6 +15,7 @@ namespace Render
     {
         public static RendererClient Client { get; private set; }
         public event Action<ModelData> OnModelReceived;
+        public event Action<SceneData> OnSceneDataReceived;
         public bool _sychronized = false;
 
         private StreamReader _streamReader;
@@ -47,7 +49,16 @@ namespace Render
 
                     if (data != null)
                     {
-                        OnModelReceived.Invoke(ModelData.Deserialize(data));
+                        if (data.Contains("[ModelData]"))
+                        {
+                            data = data.Replace("[ModelData]", "");
+                            OnModelReceived.Invoke(ModelData.Deserialize(data));
+                        }
+                        else if (data.Contains("[SceneData]"))
+                        {
+                            data = data.Replace("[SceneData]", "");
+                            OnSceneDataReceived.Invoke(SceneData.Deserialize(data));
+                        }
                     }
                 }
             });

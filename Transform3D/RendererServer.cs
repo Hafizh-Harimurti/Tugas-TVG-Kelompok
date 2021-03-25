@@ -16,12 +16,16 @@ namespace Transform3D
         private StreamWriter _streamWriter;
         private AnonymousPipeServerStream _pipeServerStream;
         private const ConsoleColor _consoleColor = ConsoleColor.Blue;
+        private Queue<string> _sendQueue = new Queue<string>();
+
+        public bool LoggingEnabled { get; set; } = true;
 
         public RendererServer()
         {
             Log("Starting up renderer...");
             SetupAnonymousPipes();
             ClearConsoleLine();
+            SendPayloads();
             Log("Renderer started.");
         }
 
@@ -29,12 +33,23 @@ namespace Transform3D
         {
             try
             {
-                var payload = modelData.Serialize();
-                _streamWriter.WriteLine(payload);
+                _sendQueue.Enqueue($"[ModelData]{modelData.Serialize()}");
 
-                _pipeServerStream.WaitForPipeDrain();
+                Log("Model data sent to the renderer.");
+            }
+            catch (IOException e)
+            {
+                Log($"Error: {e.Message}");
+            }
+        }
 
-                Log("Data sent to renderer.");
+        public void SetScene(SceneData sceneData)
+        {
+            try
+            {
+                _sendQueue.Enqueue($"[SceneData]{sceneData.Serialize()}");
+
+                Log("Scene data sent to the renderer.");
             }
             catch (IOException e)
             {
@@ -45,6 +60,22 @@ namespace Transform3D
         public void Close()
         {
             _pipeClient.Kill();
+        }
+
+        private async void SendPayloads()
+        {
+            await Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_sendQueue.Count > 0)
+                    {
+                        _streamWriter.WriteLine(_sendQueue.Dequeue());
+
+                        _pipeServerStream.WaitForPipeDrain();
+                    }
+                }
+            });
         }
 
         private void SetupAnonymousPipes()
@@ -73,17 +104,24 @@ namespace Transform3D
 
         private void Log(string message)
         {
-            var color = Console.ForegroundColor;
-            Console.ForegroundColor = _consoleColor;
-            Console.WriteLine($"[Renderer] {message}");
-            Console.ForegroundColor = color;
+            if (LoggingEnabled)
+            {
+                var color = Console.ForegroundColor;
+                Console.ForegroundColor = _consoleColor;
+                Console.WriteLine($"[Renderer] {message}");
+                Console.ForegroundColor = color;
+            }
         }
+
         private void ClearConsoleLine()
         {
-            int currentLine = Console.CursorTop;
-            Console.SetCursorPosition(0, Console.CursorTop - 1);
-            Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, currentLine - 1);
+            if (LoggingEnabled)
+            {
+                int currentLine = Console.CursorTop;
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, currentLine - 1);
+            }
         }
     }
 }
