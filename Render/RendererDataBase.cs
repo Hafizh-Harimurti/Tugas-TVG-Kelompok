@@ -9,9 +9,9 @@ namespace Render
 {
     public abstract class RendererDataBase
     {
-        public string Serialize()
+        public string Serialize(Formatting formatting = Formatting.None)
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonConvert.SerializeObject(this, formatting);
         }
     }
 }
