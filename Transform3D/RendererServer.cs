@@ -25,7 +25,7 @@ namespace Transform3D
             Log("Starting up renderer...");
             SetupAnonymousPipes();
             ClearConsoleLine();
-            SendPayloads();
+            SendQueuedPayloads();
             Log("Renderer started.");
         }
 
@@ -34,9 +34,19 @@ namespace Transform3D
             _sendQueue.Enqueue($"[ModelData]{modelData.Serialize()}");
         }
 
+        public async Task RenderAwaitableAsync(ModelData modelData)
+        {
+            await SendPayload($"[ModelData]{modelData.Serialize()}");
+        }
+
         public void SetScene(SceneData sceneData)
         {
             _sendQueue.Enqueue($"[SceneData]{sceneData.Serialize()}");
+        }
+
+        public async Task SetSceneAwaitableAsync(SceneData sceneData)
+        {
+            await SendPayload($"[SceneData]{sceneData.Serialize()}");
         }
 
         public void Close()
@@ -44,27 +54,35 @@ namespace Transform3D
             _pipeClient.Kill();
         }
 
-        private async void SendPayloads()
+        private async void SendQueuedPayloads()
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 while (true)
                 {
                     if (_sendQueue.Count > 0)
                     {
-                        try
-                        {
-                            _streamWriter.WriteLine(_sendQueue.Dequeue());
-
-                            _pipeServerStream.WaitForPipeDrain();
-
-                            Log("Render data sent to the renderer.");
-                        }
-                        catch (Exception e)
-                        {
-                            Log($"Error: {e.Message}");
-                        }
+                        await SendPayload(_sendQueue.Dequeue());
                     }
+                }
+            });
+        }
+
+        private async Task SendPayload(string payload)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    _streamWriter.WriteLine(payload);
+
+                    _pipeServerStream.WaitForPipeDrain();
+
+                    Log("Render data sent to the renderer.");
+                }
+                catch (Exception e)
+                {
+                    Log($"Error: {e.Message}");
                 }
             });
         }

@@ -36,7 +36,7 @@ namespace Render
         public MainWindow()
         {
             InitializeComponent();
-            
+
             Title = "3D Renderer - Control from the console window.";
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Width = 900;
@@ -46,15 +46,19 @@ namespace Render
             modelGroup.Children.Add(_ambientLight);
             modelGroup.Children.Add(_cameraLight);
 
-            var modelVisual3D = new ModelVisual3D();
-            modelVisual3D.Content = modelGroup;
+            var modelVisual3D = new ModelVisual3D
+            {
+                Content = modelGroup
+            };
 
-            var viewport3D = new Viewport3D();
-            viewport3D.Camera = _camera;
+            var viewport3D = new Viewport3D
+            {
+                Camera = _camera
+            };
             viewport3D.Children.Add(modelVisual3D);
 
             Content = viewport3D;
-            
+
             RendererClient.Setup(Environment.GetCommandLineArgs()[1]);
             var client = RendererClient.Client;
 

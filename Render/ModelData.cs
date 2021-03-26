@@ -9,8 +9,16 @@ using System.Windows.Media.Media3D;
 
 namespace Render
 {
-    public class ModelData : RendererDataBase
+    public class ModelData : RendererDataBase, ICloneable<ModelData>
     {
+        public ModelData() { }
+
+        public ModelData(ModelData modelData)
+        {
+            Points = modelData.Points;
+            Triangles = modelData.Triangles;
+        }
+
         public IList<Point3D> Points { get; set; }
         public int[] Triangles { get; set; }
 
@@ -39,6 +47,11 @@ namespace Render
                 Points = points,
                 Triangles = triangles.ToArray()
             };
+        }
+
+        public ModelData Clone()
+        {
+            return new ModelData(this);
         }
     }
 }

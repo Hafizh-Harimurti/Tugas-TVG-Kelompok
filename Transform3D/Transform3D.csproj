@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleHelper.cs" />
+    <Compile Include="InspectionAnimations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RendererServer.cs" />
@@ -116,6 +117,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY "$(ProjectDir)Samples" "$(ProjectDir)$(OutDir)" /E /Y</PostBuildEvent>
+    <PostBuildEvent>rmdir /s /q "$(ProjectDir)$(OutDir)/Scenes"
+rmdir /s /q "$(ProjectDir)$(OutDir)/Models"
+XCOPY "$(ProjectDir)Samples" "$(ProjectDir)$(OutDir)" /E /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

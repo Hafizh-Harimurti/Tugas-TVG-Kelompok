@@ -11,8 +11,18 @@ using System.Globalization;
 
 namespace Render
 {
-    public class SceneData : RendererDataBase
+    public class SceneData : RendererDataBase, ICloneable<SceneData>
     {
+        public SceneData() { }
+
+        public SceneData(SceneData sceneData)
+        {
+            LookPosition = sceneData.LookPosition;
+            CameraLightIntensity = sceneData.CameraLightIntensity;
+            AmbientLightIntensity = sceneData.AmbientLightIntensity;
+            ModelColorARGB = sceneData.ModelColorARGB;
+        }
+
         public Point3D LookPosition { get; set; }
         public double CameraLightIntensity { get; set; }
         public double AmbientLightIntensity { get; set; }
@@ -47,6 +57,11 @@ namespace Render
                 AmbientLightIntensity = ambientLightIntensity,
                 ModelColorARGB = modelColorARGB
             };
+        }
+
+        public SceneData Clone()
+        {
+            return new SceneData(this);
         }
     }
 }

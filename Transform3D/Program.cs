@@ -22,6 +22,7 @@ namespace Render
         private static ModelData _transformedModel = null;
         private static SceneData _scene = null;
         private static RendererServer _renderer;
+        private static CancellationTokenSource _inspectionCancellation = null;
 
         async static Task Main(string[] args)
         {
@@ -54,21 +55,23 @@ namespace Render
                     Console.WriteLine("[3] Save scene");
                     Console.WriteLine("[4] Perform a single transformation");
                     Console.WriteLine("[5] Chain multiple transformations");
-                    Console.WriteLine("[6] Reset model");
-                    Console.WriteLine("[7] Exit");
+                    Console.WriteLine("[6] Inspect model");
+                    Console.WriteLine("[7] Stop inspecting model");
+                    Console.WriteLine("[8] Reset model");
+                    Console.WriteLine("[9] Exit");
                     Console.Write("Select : ");
                     var ans = Console.ReadLine();
                     Console.WriteLine();
 
-                    if (ans == "7") break;
+                    if (ans == "9") break;
 
                     switch (ans)
                     {
                         case "0":
-                            LoadModel();
+                            await LoadModel();
                             break;
                         case "1":
-                            LoadScene();
+                            await LoadScene();
                             break;
                         case "2":
                             break;
@@ -79,6 +82,16 @@ namespace Render
                         case "5":
                             break;
                         case "6":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
+
+                            _inspectionCancellation = new CancellationTokenSource();
+                            InspectModel(_inspectionCancellation.Token);
+                            break;
+                        case "7":
+                            _inspectionCancellation.Cancel();
+                            _inspectionCancellation = null;
+                            break;
+                        case "8":
                             break;
                         default:
                             WriteError("Action not recognized.");
@@ -87,8 +100,6 @@ namespace Render
 
                     Console.WriteLine();
                 }
-
-                double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
 
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
@@ -101,7 +112,7 @@ namespace Render
             }
         }
 
-        private static void LoadModel()
+        private static async Task LoadModel()
         {
             try
             {
@@ -119,8 +130,8 @@ namespace Render
                 var fileContent = File.ReadAllText($"./Models/{filename}");
 
                 _model = ModelData.Deserialize(fileContent);
-                _transformedModel = _model;
-                _renderer.Render(_transformedModel);
+                _transformedModel = _model.Clone();
+                await _renderer.RenderAwaitableAsync(_transformedModel);
 
                 WriteSuccess("Model loaded.");
             }
@@ -135,7 +146,7 @@ namespace Render
             File.WriteAllText(path, model.Serialize());
         }
 
-        private static void LoadScene()
+        private static async Task LoadScene()
         {
             try
             {
@@ -153,7 +164,7 @@ namespace Render
                 var fileContent = File.ReadAllText($"./Scenes/{filename}");
 
                 _scene = SceneData.Deserialize(fileContent);
-                _renderer.SetScene(_scene);
+                await _renderer.SetSceneAwaitableAsync(_scene);
 
                 WriteSuccess("Scene loaded.");
             }
@@ -168,6 +179,35 @@ namespace Render
             File.WriteAllText(path, scene.Serialize());
         }
 
+        private static void InspectModel(CancellationToken cancellationToken)
+        {
+            Console.WriteLine("Select inspection mode :");
+            Console.WriteLine("[0] Rotate along the X axis");
+            Console.WriteLine("[1] Rotate along the Y axis");
+            Console.WriteLine("[2] Rotate along the Z axis");
+            Console.WriteLine();
+            Console.Write("Select : ");
+            var answer = Console.ReadLine();
+
+            switch (answer)
+            {
+                case "0":
+                    StartInspectionAnimation(InspectionAnimations.RotateAlongXAxis, cancellationToken);
+                    break;
+                case "1":
+                    StartInspectionAnimation(InspectionAnimations.RotateAlongYAxis, cancellationToken);
+                    break;
+                case "2":
+                    StartInspectionAnimation(InspectionAnimations.RotateAlongZAxis, cancellationToken);
+                    break;
+                default:
+                    WriteError("Action not recognized");
+                    return;
+            }
+
+            WriteSuccess("Inspection animation started");
+        }
+
         private static void WriteError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -180,6 +220,64 @@ namespace Render
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleHelper.DefaultConsoleForegroundColor;
+        }
+
+        private static async void StartInspectionAnimation(InspectionAnimations inspectionAnimation, CancellationToken cancellationToken)
+        {
+            // Save model state
+            var savedModel = _model.Clone();
+
+            _renderer.LoggingEnabled = false;
+            await Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        _model = savedModel;
+                        await _renderer.RenderAwaitableAsync(_model);
+                        _renderer.LoggingEnabled = true;
+                        break;
+                    }
+
+                    double DegreesToRadians(double degrees) => degrees * (Math.PI / 180);
+
+                    Transformation transformation = null;
+                    switch (inspectionAnimation)
+                    {
+                        case InspectionAnimations.RotateAlongXAxis:
+                            transformation = new Transformation()
+                            {
+                                TransformName = "RotateX",
+                                theta = DegreesToRadians(0.5)
+                            };
+                            break;
+                        case InspectionAnimations.RotateAlongYAxis:
+                            transformation = new Transformation()
+                            {
+                                TransformName = "RotateY",
+                                theta = DegreesToRadians(0.5)
+                            };
+                            break;
+                        case InspectionAnimations.RotateAlongZAxis:
+                            transformation = new Transformation()
+                            {
+                                TransformName = "RotateZ",
+                                theta = DegreesToRadians(0.5)
+                            };
+                            break;
+                    }
+
+                    _model.Points = Transformation.Transform((List<Point3D>)_model.Points, new List<Transformation>()
+                    {
+                        transformation
+                    });
+                    
+                    _renderer.Render(_model);
+
+                    await Task.Delay(5);
+                }
+            });
         }
     }
 }
