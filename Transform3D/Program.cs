@@ -35,9 +35,9 @@ namespace Render
                 // Print identity.
                 Console.WriteLine("Tugas Kelompok Teknik Visualisasi Grafis - Transformasi 3D");
                 Console.WriteLine("Identitas Anggota Kelompok :");
-                Console.WriteLine("Firdaus Bisma Suryakusuma        19/444051/TK/49247");
                 Console.WriteLine("Daffa Bil Nadzary                19/439811/TK/48541");
-                Console.WriteLine("Lorem Ipsum                      XX/XXXXXX/XX/XXXXX");
+                Console.WriteLine("Firdaus Bisma Suryakusuma        19/444051/TK/49247");
+                Console.WriteLine("Hafizh Aradhana Harimurti        19/444053/TK/49249");
                 Console.WriteLine("Please wait a while.");
                 Console.WriteLine();
                 await Task.Delay(3000);
