@@ -17,7 +17,7 @@ namespace Render
 
         }
 
-        public static double[,] TransformationsToTransformationMatrix(List<Transformation> transformations)
+        public static double[,] TransformationsToTransformationMatrix(List<Transformation> transformations) //Mengartikan kumpulan transformasi menjadi 
         {
             List<double[,]> transformationMatrices = new List<double[,]>();
             List<Transformation> tempTransformationList = new List<Transformation>();

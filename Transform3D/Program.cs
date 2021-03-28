@@ -19,10 +19,12 @@ namespace Render
     class Program
     {
         private static ModelData _model = null;
+        private static ModelData _preTransformedModel = null;
         private static ModelData _originalModel = null;
         private static SceneData _scene = null;
         private static RendererServer _renderer;
         private static CancellationTokenSource _inspectionCancellation = null;
+        private static List<Transformation> _transformations = null;
 
         async static Task Main(string[] args)
         {
@@ -68,28 +70,41 @@ namespace Render
                     switch (ans)
                     {
                         case "0":
-                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             await LoadModel();
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "1":
-                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             await LoadScene();
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "2":
+                            _model.Serialize();
+                            Console.WriteLine("Input desired model name without .txt extension:");
+                            var _modelName = Console.ReadLine();
+                            SaveModel($"./Models/{_modelName}.txt", _model);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "3":
+                            _scene.Serialize();
+                            Console.WriteLine("Input desired scene name without .txt extension:");
+                            var _sceneName = Console.ReadLine();
+                            SaveScene($"./Models/{_sceneName}.txt", _scene);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "4":
+                            _preTransformedModel = _model.Clone();
+                            BeginTransformation(false);
+                            await _renderer.RenderAwaitableAsync(_model);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "5":
+                            _preTransformedModel = _model.Clone();
+                            BeginTransformation(true);
+                            await _renderer.RenderAwaitableAsync(_model);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "6":
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
-
                             _inspectionCancellation = new CancellationTokenSource();
                             InspectModel(_inspectionCancellation.Token);
                             break;
@@ -98,10 +113,12 @@ namespace Render
                             _inspectionCancellation = null;
                             break;
                         case "8":
-                            _model = _originalModel.Clone();
-                            WriteSuccess("Model reset.");
+                            _model = _originalModel;
+                            await _renderer.RenderAwaitableAsync(_model);
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         default:
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             WriteError("Action not recognized.");
                             break;
                     }
@@ -151,8 +168,6 @@ namespace Render
 
         private static void SaveModel(string path, ModelData model)
         {
-            Console.WriteLine("The model files are saved in \'\'")
-            Console.Write()
             File.WriteAllText(path, model.Serialize());
         }
 
@@ -288,6 +303,162 @@ namespace Render
                     await Task.Delay(5);
                 }
             });
+        }
+
+        private static void BeginTransformation(bool _isMultipleTransform)
+        {
+            _transformations = new List<Transformation>();
+            Transformation _newTransformation;
+            bool _needXValue = false;
+            bool _needYValue = false;
+            bool _needZValue = false;
+            bool _needXYZPivot = false;
+            bool _needXYZPivot2 = false;
+            bool _needTheta = false;
+            try
+            {
+                do
+                {
+                    _newTransformation = new Transformation();
+                    _needXValue = false;
+                    _needYValue = false;
+                    _needZValue = false;
+                    _needXYZPivot = false;
+                    _needXYZPivot2 = false;
+                    _needTheta = false;
+                    Console.WriteLine("Choose the transformation:");
+                    Console.WriteLine("[0] Translation");
+                    Console.WriteLine("[1] Scale");
+                    Console.WriteLine("[2] Rotation");
+                    Console.WriteLine("[3] XY Shear");
+                    Console.WriteLine("[4] YZ Shear");
+                    Console.WriteLine("[5] XZ Shear");
+                    Console.WriteLine("[6] Stop Adding Transformation");
+                    Console.WriteLine();
+                    Console.Write("Select : ");
+                    var _transformationChoice = Console.ReadLine();
+                    switch (_transformationChoice)
+                    {
+                        case "0":
+                            {
+                                _newTransformation.TransformName = "Translate";
+                                _needXValue = true;
+                                _needYValue = true;
+                                _needZValue = true;
+                                break;
+                            }
+                        case "1":
+                            {
+                                _newTransformation.TransformName = "Scale";
+                                _needXValue = true;
+                                _needYValue = true;
+                                _needZValue = true;
+                                _needXYZPivot = true;
+                                break;
+                            }
+                        case "2":
+                            {
+                                _newTransformation.TransformName = "Rotate";
+                                _needXYZPivot = true;
+                                _needXYZPivot2 = true;
+                                _needTheta = true;
+                                break;
+                            }
+                        case "3":
+                            {
+                                _newTransformation.TransformName = "ShearXY";
+                                _needXValue = true;
+                                _needYValue = true;
+                                break;
+                            }
+                        case "4":
+                            {
+                                _newTransformation.TransformName = "ShearYZ";
+                                _needYValue = true;
+                                _needZValue = true;
+                                break;
+                            }
+                        case "5":
+                            {
+                                _newTransformation.TransformName = "ShearXZ";
+                                _needXValue = true;
+                                _needZValue = true;
+                                break;
+                            }
+                        case "6":
+                            {
+                                _isMultipleTransform = false;
+                                break;
+                            }
+                    }
+                    if (_needXValue)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Input X value : ");
+                        _newTransformation.amountX = Convert.ToDouble(Console.ReadLine());
+                    }
+                    if (_needYValue)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Input Y value : ");
+                        _newTransformation.amountY = Convert.ToDouble(Console.ReadLine());
+                    }
+                    if (_needZValue)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Input Z value : ");
+                        _newTransformation.amountZ = Convert.ToDouble(Console.ReadLine());
+                    }
+                    if (_needXYZPivot)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Input X for pivot point:");
+                        _newTransformation.pivotX1 = Convert.ToDouble(Console.ReadLine());
+                        Console.WriteLine();
+                        Console.Write("Input Y for pivot point:");
+                        _newTransformation.pivotY1 = Convert.ToDouble(Console.ReadLine());
+                        Console.WriteLine();
+                        Console.Write("Input Z for pivot point:");
+                        _newTransformation.pivotZ1 = Convert.ToDouble(Console.ReadLine());
+                    }
+                    if (_needXYZPivot2)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Input X for another pivot point to create pivot axis:");
+                        _newTransformation.pivotX2 = Convert.ToDouble(Console.ReadLine());
+                        Console.WriteLine();
+                        Console.Write("Input Y for another pivot point to create pivot axis:");
+                        _newTransformation.pivotY2 = Convert.ToDouble(Console.ReadLine());
+                        Console.WriteLine();
+                        Console.Write("Input Z for another pivot point to create pivot axis:");
+                        _newTransformation.pivotZ2 = Convert.ToDouble(Console.ReadLine());
+                    }
+                    if (_needTheta)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Input rotation amount (in degree):");
+                        _newTransformation.theta = Convert.ToDouble(Console.ReadLine()) / 180 * Math.PI;
+                    }
+                    _transformations.Add(_newTransformation);
+                    Console.WriteLine();
+                } while (_isMultipleTransform);
+                _model.Points = Transformation.Transform(_model.Points.ToList(), _transformations);
+                Console.WriteLine("List of each vertex before and after transformation:");
+                string _beforeTransform, _afterTransform;
+                for (int i = 0; i < _model.Points.Count; i++)
+                {
+                    _beforeTransform = '(' + _preTransformedModel.Points[i].X.ToString() + ',' + _preTransformedModel.Points[i].Y.ToString() + ',' + _preTransformedModel.Points[i].Z.ToString() + ')';
+                    _afterTransform = '(' + _model.Points[i].X.ToString() + ',' + _model.Points[i].Y.ToString() + ',' + _model.Points[i].Z.ToString() + ')';
+                    Console.WriteLine($"{_beforeTransform} -> {_afterTransform}");
+                }
+                Console.WriteLine();
+            }
+            catch
+            {
+                Console.WriteLine();
+                WriteError("Invalid input detected");
+                Console.WriteLine();
+            }
         }
     }
 }
