@@ -18,6 +18,11 @@ namespace Render
 {
     class Program
     {
+        //Anggota Kelompok:
+        //Daffa Bil Nadzary (19/439811/TK/48541)
+        //Firdaus Bisma Suryakusuma (19/444051/TK/49247)
+        //Hafizh Aradhana Harimurti (19/444053/TK/49249)
+
         private static ModelData _model = null;
         private static ModelData _preTransformedModel = null;
         private static ModelData _originalModel = null;
