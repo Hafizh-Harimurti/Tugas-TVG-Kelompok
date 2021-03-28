@@ -47,10 +47,20 @@ namespace Render
 
                 Console.WriteLine();
 
-                // Load defaul scene
-                var fileContent = File.ReadAllText($"./Scenes/default-scene.txt");
-                _scene = SceneData.Deserialize(fileContent);
+                // Load default model
+                Console.WriteLine("Loading default model(cube)...");
+                var modelFileContent = File.ReadAllText($"./Models/default-cube.txt");
+                _model = ModelData.Deserialize(modelFileContent);
+                _originalModel = _model.Clone();
+                await _renderer.RenderAwaitableAsync(_originalModel);
+
+                // Load default scene
+                Console.WriteLine("Loading default scene...");
+                var sceneFileContent = File.ReadAllText($"./Scenes/default-scene.txt");
+                _scene = SceneData.Deserialize(sceneFileContent);
                 await _renderer.SetSceneAwaitableAsync(_scene);
+
+                Console.WriteLine();
 
                 // Prompt action
                 while (true)
