@@ -22,7 +22,7 @@ namespace Render
     public partial class MainWindow : Window
     {
         private GeometryModel3D _currentModel = new GeometryModel3D();
-        private Color _modelColor = Colors.DodgerBlue;
+        private SolidColorBrush _modelBrush = new SolidColorBrush(Colors.DodgerBlue);
         private PerspectiveCamera _camera = new PerspectiveCamera()
         {
             FarPlaneDistance = 20,
@@ -80,7 +80,7 @@ namespace Render
                         {
                             Children = new MaterialCollection(new List<Material>()
                             {
-                                new DiffuseMaterial(new SolidColorBrush(_modelColor))
+                                new DiffuseMaterial(_modelBrush)
                             })
                         }
                     };
@@ -136,7 +136,7 @@ namespace Render
                 // Setup model color.
                 _currentModel.Dispatcher.Invoke(() =>
                 {
-                    _modelColor = sceneData.ModelColorARGB;
+                    _modelBrush.Color = sceneData.ModelColorARGB;
                 });
             };
         }

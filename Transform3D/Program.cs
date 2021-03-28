@@ -19,7 +19,7 @@ namespace Render
     class Program
     {
         private static ModelData _model = null;
-        private static ModelData _transformedModel = null;
+        private static ModelData _originalModel = null;
         private static SceneData _scene = null;
         private static RendererServer _renderer;
         private static CancellationTokenSource _inspectionCancellation = null;
@@ -68,18 +68,24 @@ namespace Render
                     switch (ans)
                     {
                         case "0":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             await LoadModel();
                             break;
                         case "1":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             await LoadScene();
                             break;
                         case "2":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "3":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "4":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "5":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "6":
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
@@ -92,6 +98,8 @@ namespace Render
                             _inspectionCancellation = null;
                             break;
                         case "8":
+                            _model = _originalModel.Clone();
+                            WriteSuccess("Model reset.");
                             break;
                         default:
                             WriteError("Action not recognized.");
@@ -130,8 +138,8 @@ namespace Render
                 var fileContent = File.ReadAllText($"./Models/{filename}");
 
                 _model = ModelData.Deserialize(fileContent);
-                _transformedModel = _model.Clone();
-                await _renderer.RenderAwaitableAsync(_transformedModel);
+                _originalModel = _model.Clone();
+                await _renderer.RenderAwaitableAsync(_originalModel);
 
                 WriteSuccess("Model loaded.");
             }
@@ -143,6 +151,8 @@ namespace Render
 
         private static void SaveModel(string path, ModelData model)
         {
+            Console.WriteLine("The model files are saved in \'\'")
+            Console.Write()
             File.WriteAllText(path, model.Serialize());
         }
 
