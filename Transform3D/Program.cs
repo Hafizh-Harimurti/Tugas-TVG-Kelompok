@@ -47,6 +47,21 @@ namespace Render
 
                 Console.WriteLine();
 
+                // Load default model
+                Console.WriteLine("Loading default model(cube)...");
+                var modelFileContent = File.ReadAllText($"./Models/default-cube.txt");
+                _model = ModelData.Deserialize(modelFileContent);
+                _originalModel = _model.Clone();
+                await _renderer.RenderAwaitableAsync(_originalModel);
+
+                // Load default scene
+                Console.WriteLine("Loading default scene...");
+                var sceneFileContent = File.ReadAllText($"./Scenes/default-scene.txt");
+                _scene = SceneData.Deserialize(sceneFileContent);
+                await _renderer.SetSceneAwaitableAsync(_scene);
+
+                Console.WriteLine();
+
                 // Prompt action
                 while (true)
                 {
@@ -70,12 +85,12 @@ namespace Render
                     switch (ans)
                     {
                         case "0":
-                            await LoadModel();
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
+                            await LoadModel();
                             break;
                         case "1":
-                            await LoadScene();
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
+                            await LoadScene();
                             break;
                         case "2":
                             _model.Serialize();

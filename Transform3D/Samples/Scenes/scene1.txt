@@ -1,6 +1,6 @@
 {
-  "LookPosition": "3,3,4",
-  "CameraLightIntensity": 0.6,
-  "AmbientLightIntensity": 0.6,
-  "ModelColorARGB": "#FF1E90FF"
+  "LookPosition": "5,0,0",
+  "CameraLightIntensity": 0.8,
+  "AmbientLightIntensity": 0.8,
+  "ModelColorARGB": "#FF20B2AA"
 }
