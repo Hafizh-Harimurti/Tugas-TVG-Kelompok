@@ -17,7 +17,7 @@ namespace Render
 
         }
 
-        public static double[,] TransformationsToTransformationMatrix(List<Transformation> transformations) //Mengartikan kumpulan transformasi menjadi 
+        private static double[,] TransformationsToTransformationMatrix(List<Transformation> transformations) //Mengartikan kumpulan transformasi menjadi matriks transformasi
         {
             List<double[,]> transformationMatrices = new List<double[,]>();
             List<Transformation> tempTransformationList = new List<Transformation>();
@@ -143,7 +143,7 @@ namespace Render
             return transformationMatrix;
         }
 
-        public static List<Point3D> Transform(List<Point3D> cartesianPoints, List<Transformation> transformationList)
+        public static List<Point3D> Transform(List<Point3D> cartesianPoints, List<Transformation> transformationList) //Menghasilkan titik-titik yang sudah ditransformasikan
         {
             List<Point3D> result = new List<Point3D>();
             List<Transformation> transformations = new List<Transformation>();
@@ -164,11 +164,11 @@ namespace Render
             return result;
         }
 
-        public static double[,] IdentityMatrix()
+        public static double[,] IdentityMatrix() //Membuat matriks identitas
         {
             return new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
         }
-        public static double[,] MatrixMultiplication(double[,] matrix1, double[,] matrix2)
+        public static double[,] MatrixMultiplication(double[,] matrix1, double[,] matrix2) //Melakukan perkalian matriks 4x4 dengan matriks 4x4
         {
             double[,] result = new double[4, 4];
             for (int i = 0; i < 4; i++)
@@ -180,7 +180,7 @@ namespace Render
                 }
             return result;
         }
-        public static double[] MatrixMultiplication(double[,] matrix1, double[] matrix2)
+        public static double[] MatrixMultiplication(double[,] matrix1, double[] matrix2) //Melakukan perkalian matriks 4x4 dengan matriks 4x1
         {
             double[] result = new double[4];
             for (int i = 0; i < 4; i++)

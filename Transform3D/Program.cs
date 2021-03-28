@@ -94,14 +94,14 @@ namespace Render
                             break;
                         case "2":
                             _model.Serialize();
-                            Console.WriteLine("Input desired model name without .txt extension:");
+                            Console.Write("Input desired model name without .txt extension : ");
                             var _modelName = Console.ReadLine();
                             SaveModel($"./Models/{_modelName}.txt", _model);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "3":
                             _scene.Serialize();
-                            Console.WriteLine("Input desired scene name without .txt extension:");
+                            Console.WriteLine("Input desired scene name without .txt extension : ");
                             var _sceneName = Console.ReadLine();
                             SaveScene($"./Models/{_sceneName}.txt", _scene);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
@@ -427,38 +427,38 @@ namespace Render
                     if (_needXYZPivot)
                     {
                         Console.WriteLine();
-                        Console.Write("Input X for pivot point:");
+                        Console.Write("Input X for pivot point : ");
                         _newTransformation.pivotX1 = Convert.ToDouble(Console.ReadLine());
                         Console.WriteLine();
-                        Console.Write("Input Y for pivot point:");
+                        Console.Write("Input Y for pivot point : ");
                         _newTransformation.pivotY1 = Convert.ToDouble(Console.ReadLine());
                         Console.WriteLine();
-                        Console.Write("Input Z for pivot point:");
+                        Console.Write("Input Z for pivot point : ");
                         _newTransformation.pivotZ1 = Convert.ToDouble(Console.ReadLine());
                     }
                     if (_needXYZPivot2)
                     {
                         Console.WriteLine();
-                        Console.Write("Input X for another pivot point to create pivot axis:");
+                        Console.Write("Input X for another pivot point to create pivot axis : ");
                         _newTransformation.pivotX2 = Convert.ToDouble(Console.ReadLine());
                         Console.WriteLine();
-                        Console.Write("Input Y for another pivot point to create pivot axis:");
+                        Console.Write("Input Y for another pivot point to create pivot axis : ");
                         _newTransformation.pivotY2 = Convert.ToDouble(Console.ReadLine());
                         Console.WriteLine();
-                        Console.Write("Input Z for another pivot point to create pivot axis:");
+                        Console.Write("Input Z for another pivot point to create pivot axis : ");
                         _newTransformation.pivotZ2 = Convert.ToDouble(Console.ReadLine());
                     }
                     if (_needTheta)
                     {
                         Console.WriteLine();
-                        Console.Write("Input rotation amount (in degree):");
+                        Console.Write("Input rotation amount (in degree) : ");
                         _newTransformation.theta = Convert.ToDouble(Console.ReadLine()) / 180 * Math.PI;
                     }
                     _transformations.Add(_newTransformation);
                     Console.WriteLine();
                 } while (_isMultipleTransform);
                 _model.Points = Transformation.Transform(_model.Points.ToList(), _transformations);
-                Console.WriteLine("List of each vertex before and after transformation:");
+                Console.WriteLine("List of each vertex before and after transformation :");
                 string _beforeTransform, _afterTransform;
                 for (int i = 0; i < _model.Points.Count; i++)
                 {
