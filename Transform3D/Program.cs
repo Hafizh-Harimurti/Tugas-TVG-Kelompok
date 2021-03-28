@@ -47,6 +47,11 @@ namespace Render
 
                 Console.WriteLine();
 
+                // Load defaul scene
+                var fileContent = File.ReadAllText($"./Scenes/default-scene.txt");
+                _scene = SceneData.Deserialize(fileContent);
+                await _renderer.SetSceneAwaitableAsync(_scene);
+
                 // Prompt action
                 while (true)
                 {
@@ -70,12 +75,12 @@ namespace Render
                     switch (ans)
                     {
                         case "0":
-                            await LoadModel();
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
+                            await LoadModel();
                             break;
                         case "1":
-                            await LoadScene();
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
+                            await LoadScene();
                             break;
                         case "2":
                             _model.Serialize();
