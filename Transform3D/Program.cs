@@ -133,7 +133,7 @@ namespace Render
                             _inspectionCancellation = null;
                             break;
                         case "8":
-                            _model = _originalModel;
+                            _model = _originalModel.Clone();
                             await _renderer.RenderAwaitableAsync(_model);
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
