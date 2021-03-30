@@ -98,30 +98,30 @@ namespace Render
                             await LoadScene();
                             break;
                         case "2":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             _model.Serialize();
                             Console.Write("Input desired model name without .txt extension : ");
                             var _modelName = Console.ReadLine();
                             SaveModel($"./Models/{_modelName}.txt", _model);
-                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "3":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             _scene.Serialize();
                             Console.WriteLine("Input desired scene name without .txt extension : ");
                             var _sceneName = Console.ReadLine();
                             SaveScene($"./Models/{_sceneName}.txt", _scene);
-                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "4":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             _preTransformedModel = _model.Clone();
                             BeginTransformation(false);
                             await _renderer.RenderAwaitableAsync(_model);
-                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "5":
+                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             _preTransformedModel = _model.Clone();
                             BeginTransformation(true);
                             await _renderer.RenderAwaitableAsync(_model);
-                            if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
                             break;
                         case "6":
                             if (_inspectionCancellation != null) _inspectionCancellation.Cancel();
