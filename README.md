@@ -1,6 +1,7 @@
 Untuk menjalankan program ini, silahkan menjalankan file executable Transform3D.exe. file executable ini akan menjalankan executable lain bernama Render3D.exe secara otomatis. executable Render3D berfungsi untuk me-render bentuk 3 dimensi. Kedua program ini berkomunikasi menggunakan metode inter-process communication berupa anonymous pipes.
 
 adapun kegunaan tiap-tiap menu pada program transformasi 3D ini yaitu : 
+
 [0] Load model
 Berfungsi untuk men-load model yang berisi data mengenai titik-titik pada model 3 dimensi serta triangle-triangle yang membentuk permukaan model 3 dimensi tersebut. data model yang di-load berisi json yang bisa diubah secara manual. daftar file di-load dari 
 
